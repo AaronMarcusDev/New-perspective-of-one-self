@@ -7,7 +7,7 @@ int audioVisualScale;
 float aofs;
 
 void setup() {
-  size(600, 400);
+  size(1200, 850);
   pixelDensity(1);
   audioVisualScale = 5; // to increase how much larger the visual gets depending on the audio input.
   // Essentially a multiplier
@@ -26,19 +26,20 @@ void draw() {
   float level = mic.mix.level();
 
   // Scale it up to screen height
-  float barHeight = map(level, 0, 0.5, 0, height) * audioVisualScale;
+  // float barHeight = map(level, 0, 0.5, 0, height) * audioVisualScale;
   // Make audio influence the animation speed
   float audioBoost = map(level, 0, 0.3, 0.001, 0.05);
 
-  visualise(audioBoost);
+  visualiseSound(audioBoost);
 
   // fill(0, 200, 255);
   // rect(width/2 - 50, height - barHeight, 100, barHeight);
 }
 
-void visualise(float audioBoost) {
+void visualiseSound(float audioBoost) {
 
-  float noiseHue = noise(frameCount * 0.01);
+  float noiseHue = noise(frameCount * 0.01) * (1 + mic.mix.level() * 0.2);
+  //                                                    ^-- add 20% effect of the sound amplitude
   loadPixels();
 
   for (int y = 0; y < height; y++) {
