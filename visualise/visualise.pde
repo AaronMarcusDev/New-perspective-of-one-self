@@ -38,6 +38,7 @@ void draw() {
 
 void visualise(float audioBoost) {
 
+  float noiseHue = noise(frameCount * 0.01);
   loadPixels();
 
   for (int y = 0; y < height; y++) {
@@ -50,7 +51,8 @@ void visualise(float audioBoost) {
       float alpha1 = 2*PI*(d + (fx + .5*fy)) + aofs;
       float alpha2 = 2*PI*(d + (-.5*fx - fy) * sin(.5*aofs)) + aofs;
 
-      float hue = 1 + sin(alpha1) * sin(alpha2);
+
+      float hue = noiseHue + sin(alpha1) * sin(alpha2);
 
       pixels[y*width + x] = color(hue, 1, 1);
     }
