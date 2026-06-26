@@ -1,5 +1,7 @@
 class TreeSegment {
-  float segmentLength;
+  float maxLength;
+  float growIncrement = 1;
+  float segmentLength = 0;
   float segmentWidth = 4;
   float mass;
   float force;
@@ -12,16 +14,16 @@ class TreeSegment {
   color segmentColor = color(120, 80, 0);
 
   TreeSegment parent;
-  TreeSegment[] children;
+  ArrayList<TreeSegment> children;
   PVector offsetPos;
 
-  TreeSegment (float newLength, float newWidth, float newMass, float newSpringConstant, float newDamping, float newStartAngle) {
-    segmentLength = newLength;
-    segmentWidth = newWidth;
-    mass = newMass;
-    springConstant = newSpringConstant;
-    damping = newDamping;
-    startAngle = newStartAngle;
+  TreeSegment (float maxLength, float segmentWidth, float mass, float springConstant, float damping, float startAngle) {
+    this.maxLength = maxLength;
+    this.segmentWidth = segmentWidth;
+    this.mass = mass;
+    this.springConstant = springConstant;
+    this.damping = damping;
+    this.startAngle = startAngle;
     force = 0;
     velocity = 0;
     angle = 0;
@@ -55,13 +57,13 @@ class TreeSegment {
     realAngle = angle + startAngle + previousAngle;
   }
 
-  void render() {
-    // Leaves
-    if (parent != null) {
-      fill(20, 200, 20);
-      circle(0, -segmentLength, segmentWidth*8);
+  void growIncrement(float increment) {
+    if (segmentLength <= maxLength && increment > 0 || segmentLength > 0 && increment < 0) {
+      segmentLength += increment;
     }
+  }
 
+  void render() {
     fill(segmentColor);
     rect(0, -segmentLength/2, segmentWidth, segmentLength);
     circle(0, 0, segmentWidth/2);

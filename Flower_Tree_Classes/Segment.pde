@@ -1,5 +1,6 @@
 class Segment {
   float segmentLength;
+  float maxLength;
   float segmentWidth = 4;
   float mass;
   float force;
@@ -9,12 +10,12 @@ class Segment {
   float damping;
   color segmentColor = color(80, 240, 80);
 
-  Segment (float newLength, float newWidth, float newMass, float newSpringConstant, float newDamping) {
-    segmentLength = newLength;
-    segmentWidth = newWidth;
-    mass = newMass;
-    springConstant = newSpringConstant;
-    damping = newDamping;
+  Segment (float segmentLength, float segmentWidth, float mass, float springConstant, float damping) {
+    this.maxLength = segmentLength;
+    this.segmentWidth = segmentWidth;
+    this.mass = mass;
+    this.springConstant = springConstant;
+    this.damping = damping;
     force = 0;
     velocity = 0;
     angle = 0;
@@ -24,6 +25,12 @@ class Segment {
     velocity += (-force+nextForce)/mass;
     angle += velocity-previousVelocity;
     force = angle * springConstant + velocity * damping;
+  }
+
+  void growIncrement(float increment) {
+    if (segmentLength <= maxLength && increment > 0 || segmentLength > 0 && increment < 0) {
+      segmentLength += increment;
+    }
   }
 
   void render() {
