@@ -257,9 +257,13 @@ void draw() {
   microphone.render();
 
   if (hb.sensorOK == false) {
-    fill(255,0,0);
+    fill(255, 0, 0);
     textSize(34);
     text("Warning: the heartbeat sensor has no connection.", 10, height -30);
+  } else if (!hb.fingerDetected) {
+    fill(255, 0, 0);
+    textSize(34);
+    text("Put your finger on the Heartbeat Sensor!", 10, height - 30);
   }
 
   checkExperienceDuration();
