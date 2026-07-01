@@ -45,7 +45,7 @@ void setup() {
   fullScreen();
   noStroke();
   Fade = new flash(color(#000000), 0, 10);
-  
+
   hill[0] = new Hill(0, 255); // wet hill visible
   hill[1] = new Hill(1, 0);    // dry hill hidden
   hill[2] = new Hill(2, 255); // white bacground (so no seethrough)
@@ -256,7 +256,7 @@ void draw() {
   //fill(160);
   //textSize(16);
   //text("BPM", width / 2, height / 2 + 50);
-  
+
   checkExperienceDuration();
   resetChecker();
 }
@@ -315,7 +315,7 @@ void resetGlobalVars() {
 
 void setupReset() {
   noStroke();
-  
+
   hill[0] = new Hill(0, 255); // wet hill visible
   hill[1] = new Hill(1, 0);    // dry hill hidden
   hill[2] = new Hill(2, 255); // white bacground (so no seethrough)
@@ -338,6 +338,8 @@ void setupReset() {
   funnyTreeDebris = new TreeDebris();
 
   audioAnalyzer = new BufferedAudioAnalyzer(this);
+
+  microphone.reset();
 }
 
 void resetExperience() {
