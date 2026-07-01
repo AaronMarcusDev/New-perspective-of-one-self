@@ -18,7 +18,7 @@ FlowerDebris funnyFlowerDebris;
 TreeDebris funnyTreeDebris;
 Microphone microphone;
 
-final int sessionTimeLimit = 3*10*1000; // time limit for the user in milliseconds
+final int sessionTimeLimit = 90*1000; // time limit for the user in milliseconds
 final int gracePeriod = 4000; // ms to hold the lush intro before audio starts affecting things
 final int resetPauseTime = 5000; // time in ms to hold black screen
 int sessionStartTime = millis();
@@ -106,8 +106,8 @@ void draw() {
   }
 
   //fixes adjustnments for wind, clouds, rain, and lightning
-  HeartBeatSpeedMultiplier = map(hb.getBPM(), 45, 140, 1, 5); //change to heartbeat
-  HeartBeatAmountMultiplier = HeartBeatSpeedMultiplier; //change with heartbeat
+  HeartBeatSpeedMultiplier = map(hb.getBPM(), 45, 140, 1, 5);
+  HeartBeatAmountMultiplier = HeartBeatSpeedMultiplier; //change to heartbeat
 
   //adjustment for trees and flowers
   if (HeartBeatAmountMultiplier>=2.5) {
@@ -255,6 +255,12 @@ void draw() {
 
   microphone.update();
   microphone.render();
+
+  if (hb.sensorOK == false) {
+    fill(255,0,0);
+    textSize(34);
+    text("Warning: the heartbeat sensor has no connection.", 10, height -30);
+  }
 
   checkExperienceDuration();
   resetChecker();

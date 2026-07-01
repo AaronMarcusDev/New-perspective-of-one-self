@@ -71,7 +71,8 @@ class HeartbeatMonitor implements Runnable {
       fetchOnce();
       try {
         Thread.sleep(pollIntervalMillis);
-      } catch (InterruptedException e) {
+      }
+      catch (InterruptedException e) {
         // exiting
       }
     }
@@ -81,7 +82,10 @@ class HeartbeatMonitor implements Runnable {
   void fetchOnce() {
     try {
       JSONObject json = loadJSONObject(dataURL);
-      if (json == null) return;
+      if (json == null) {
+        sensorOK = false;
+        return;
+      };
 
       sensorOK       = json.getBoolean("sensor", false);
       fingerDetected = json.getBoolean("finger", false);
@@ -96,7 +100,8 @@ class HeartbeatMonitor implements Runnable {
         targetBPM          = received;
         framesSinceReading = 0;
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       // Sensor unreachable / malformed JSON — just skip this poll
       println("HeartbeatMonitor: fetch failed (" + e.getMessage() + ")");
     }
