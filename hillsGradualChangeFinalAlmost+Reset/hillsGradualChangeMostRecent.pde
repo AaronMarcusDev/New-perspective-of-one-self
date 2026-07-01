@@ -18,7 +18,7 @@ FlowerDebris funnyFlowerDebris;
 TreeDebris funnyTreeDebris;
 Microphone microphone;
 
-final int sessionTimeLimit = 90*1000; // time limit for the user in milliseconds
+final int sessionTimeLimit = 10*1000; // time limit for the user in milliseconds
 final int gracePeriod = 4000; // ms to hold the lush intro before audio starts affecting things
 final int resetPauseTime = 5000; // time in ms to hold black screen
 int sessionStartTime = millis();
@@ -256,7 +256,7 @@ void draw() {
   microphone.update();
   microphone.render();
 
-  if (hb.sensorOK == false) {
+  if (!hb.sensorOK) {
     fill(255, 0, 0);
     textSize(34);
     text("Warning: the heartbeat sensor has no connection.", 10, height -30);
@@ -367,10 +367,16 @@ void resetChecker() {
   if (isResetting) {
     Fade.displayFlash();
     if (Fade.getAlpha() >= 255) {
-      resetExperience();
-      delay(resetPauseTime); // hold black screen
-      sessionStartTime = millis();
-      Fade.setAlphaInc(-10);
+      fill(color(#ffffff));
+      textSize(50);
+      textAlign(CENTER);
+      text("Touch the sensor to start the installation", width/2, height/2);
+      if (hb.fingerDetected) {
+        resetExperience();
+        delay(resetPauseTime); // hold black screen
+        sessionStartTime = millis();
+        Fade.setAlphaInc(-10);
+      }
     } else if (Fade.getAlpha() <= 0) {
       isResetting = false;
     }
