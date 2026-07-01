@@ -16,6 +16,8 @@ flash Flash;
 FlowerDebris funnyFlowerDebris;
 TreeDebris funnyTreeDebris;
 
+Microphone microphone;
+
 int groundLevel = 600;
 int rainSetting = 3;
 int rainTimer = 0;
@@ -51,6 +53,14 @@ void setup() {
   }
 
   Flash = new flash(0);
+
+  // Microphone icon settings
+  PVector micPos = new PVector(width/2, height/2);
+  float micLifetime = 150; // ticks down per frame
+  float micFadeOutThreshold = 90; // per frame
+  
+  microphone = new Microphone(micPos, micLifetime, micFadeOutThreshold);
+
 
   // FLOWER DEBRIS
   funnyFlowerDebris = new FlowerDebris();
@@ -110,7 +120,7 @@ void draw() {
   } else {
     rainy = false;
   }
- 
+
   //make trees/flowers grow
   if (time>=cooldown && !isDesert) {
     if (currentVol <= 3) {
@@ -187,11 +197,14 @@ void draw() {
     funnyFlowerDebris.toggleGrowth(true);
     funnyTreeDebris.toggleGrowth(true);
   }
-  
-    //make clouds
+
+  //make clouds
   if (currentVol>=1.2 || currentFreq>=1.2) {
     drawClouds();
   }
+  
+  microphone.update();
+  microphone.render();
 
   //hb.update();
   //float bpm = hb.getBPM();
