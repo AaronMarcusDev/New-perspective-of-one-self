@@ -42,8 +42,19 @@ class FlowerDebris {
     MSDSystem flower = new MSDSystem(pos, flowerLength, flowerWidth, flowerMass, flowerSpringConstant, flowerDamping, flowerSegments);
     flower.toggleGrowth(growEnabled);
     flower.growFactor = growFactor;
+    
+    float scaleMult = map(pos.y, 0, height, 0, 1);
+    flower.setScaleFactor(scaleMult);
 
-    flowers.add(flower);
+    int i = 0;
+
+    if (flowers.size() > 0) { // Condition that avoids an error when placing the first flower (with no other flowers present)
+      while (pos.y > flowers.get(i).pos.y && i < flowers.size() - 1) { // Checks position of flower to others to set to correct index in array (so the debris renders it after the flowers in front, but before the ones behind it)
+        i++;
+      }
+    }
+
+    flowers.add(i, flower);
   }
 
   void toggleGrowth(boolean growEnabled) {

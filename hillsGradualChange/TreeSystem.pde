@@ -15,6 +15,9 @@ class TreeSystem {
   float growthFactor = 1;
   boolean dead = false;
 
+  float scaleFactor = 1;
+
+
   TreeSystem (PVector pos, float rootLength, float rootWidth, float mass, float springConstant, float damping, int maxDepth, int branchingFactor) {
     this.pos = pos;
     this.rootLength = rootLength;
@@ -56,6 +59,7 @@ class TreeSystem {
   void render() {
     pushMatrix();
     translate(pos.x, pos.y);
+    scale(scaleFactor);
 
     for (TreeSegment segment : treeSegments) {
       PVector offsetPos = segment.offsetPos;
@@ -140,5 +144,9 @@ class TreeSystem {
 
   void toggleGrowth(boolean growEnabled) {
     this.growEnabled = growEnabled;
+  }
+
+  void setScaleFactor(float scaleFactor) {
+    this.scaleFactor = scaleFactor;
   }
 }

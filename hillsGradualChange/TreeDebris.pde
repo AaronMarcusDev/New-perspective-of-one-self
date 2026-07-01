@@ -19,7 +19,7 @@ class TreeDebris {
   }
 
   void update() {
-    for (int i = 0; i < trees.size(); i++) {
+    for (int i = trees.size() - 1; i >= 0; i--) {
       TreeSystem tree = trees.get(i);
 
       if (tree.dead == true) {
@@ -46,7 +46,18 @@ class TreeDebris {
     newTree.toggleGrowth(growEnabled);
     newTree.growthFactor = growthFactor;
 
-    trees.add(newTree);
+    float scaleMult = map(treePos.y, 0, height, 0, 1);
+    newTree.setScaleFactor(scaleMult);
+
+    int i = 0;
+
+    if (trees.size() > 0) { // Condition that avoids an error when placing the first tree (with no other trees present)
+      while (treePos.y > trees.get(i).pos.y && i < trees.size() - 1) { // Checks position of tree to others to set to correct index in array (so the debris renders it after the trees in front, but before the ones behind it)
+        i++;
+      }
+    }
+
+    trees.add(i, newTree);
   }
 
   void applyForce(float force) {

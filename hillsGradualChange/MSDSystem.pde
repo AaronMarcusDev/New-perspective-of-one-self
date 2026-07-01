@@ -13,6 +13,8 @@ class MSDSystem {
   float growFactor = 1;
   boolean dead = false;
 
+  float scaleFactor = 1;
+
   MSDSystem (PVector pos, float systemLength, float systemWidth, float mass, float springConstant, float damping, int segmentAmount) {
     this.pos = pos;
     this.systemLength = systemLength;
@@ -69,6 +71,7 @@ class MSDSystem {
   void render() {
     pushMatrix();
     translate(pos.x, pos.y);
+    scale(scaleFactor);
 
     float lastSegmentOffset = 0;
 
@@ -109,5 +112,9 @@ class MSDSystem {
     for (Segment segment : segments) {
       segment.segmentColor = newColor;
     }
+  }
+
+  void setScaleFactor(float scaleFactor) {
+    this.scaleFactor = scaleFactor;
   }
 }
