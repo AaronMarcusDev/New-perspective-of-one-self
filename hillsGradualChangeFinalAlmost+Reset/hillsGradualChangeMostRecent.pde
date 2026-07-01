@@ -96,14 +96,18 @@ void draw() {
   // 2. Grab the processed 1-10 numbers
   float currentFreq = audioAnalyzer.latestAvgFreq;
   float currentVol = audioAnalyzer.latestAvgVol;
-  
+
   // Heartbeat monitor
   hb.update();
   float bpm = hb.getBPM();
+  if (hb.fingerDetected) {
+    println(bpm);
+    println(hb.lastBpmAvg);
+  }
 
   //fixes adjustnments for wind, clouds, rain, and lightning
-  HeartBeatSpeedMultiplier = currentFreq; //change to heartbeat
-  HeartBeatAmountMultiplier = currentVol; //change with heartbeat
+  HeartBeatSpeedMultiplier = map(hb.getBPM(), 45, 140, 1, 5); //change to heartbeat
+  HeartBeatAmountMultiplier = HeartBeatSpeedMultiplier; //change with heartbeat
 
   //adjustment for trees and flowers
   if (HeartBeatAmountMultiplier>=2.5) {
