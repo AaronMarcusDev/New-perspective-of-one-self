@@ -80,10 +80,11 @@ void setup() {
 
   //  textAlign(CENTER, CENTER);
 
-  // To see all devices: printArray(Serial.list())
-  //hb = new HeartbeatMonitor(this, Serial.list()[0], 9600);
-  //hb.setInitialBPM(72);       // nice default so it's not 0 at startup
-  //hb.setNoiseSigma(1.2);      // ±1-2 BPM wobble feels natural for a demo
+  hb = new HeartbeatMonitor(this, "http://192.168.4.1/data");
+  hb.setInitialBPM(72);
+  hb.setNoiseSigma(1.2);
+  hb.setPollInterval(1000);   // poll the sensor once a second
+  hb.setInterpFrames(60);     // spread each step over ~1s at 60fps
 }
 
 
@@ -95,6 +96,10 @@ void draw() {
   // 2. Grab the processed 1-10 numbers
   float currentFreq = audioAnalyzer.latestAvgFreq;
   float currentVol = audioAnalyzer.latestAvgVol;
+  
+  // Heartbeat monitor
+  hb.update();
+  float bpm = hb.getBPM();
 
   //fixes adjustnments for wind, clouds, rain, and lightning
   HeartBeatSpeedMultiplier = currentFreq; //change to heartbeat
@@ -107,6 +112,7 @@ void draw() {
     time+=3;
   }
 
+  // Getting the force from the wind
   float windForce = wind.getForce();
   funnyFlowerDebris.applyForce(windForce);
   funnyTreeDebris.applyForce(windForce);
@@ -128,7 +134,7 @@ void draw() {
   }
 
 
-  //makeLighntning with adjustment
+  //makeLightning with adjustment
   if (!inGracePeriod() && currentFreq <= 2.5 && currentVol >= 2.5) {
     timer++;
     if (HeartBeatAmountMultiplier >= 2.5) {
@@ -245,17 +251,6 @@ void draw() {
 
   microphone.update();
   microphone.render();
-
-  //hb.update();
-  //float bpm = hb.getBPM();
-
-  //fill(255, 80, 80);
-  //textSize(64);
-  //text(nf(bpm, 0, 1), width / 2, height / 2);
-
-  //fill(160);
-  //textSize(16);
-  //text("BPM", width / 2, height / 2 + 50);
 
   checkExperienceDuration();
   resetChecker();

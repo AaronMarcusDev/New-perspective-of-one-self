@@ -28,7 +28,6 @@ class Microphone {
 
     alpha = map(lifetime, 0, fadeOutThreshold, 0, 255);
     alpha = constrain(alpha, 0, 255);
-    println(alpha);
   }
 
   void render() {
