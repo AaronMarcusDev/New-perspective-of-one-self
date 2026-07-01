@@ -15,10 +15,12 @@ HeartbeatMonitor hb;
 flash Flash;
 FlowerDebris funnyFlowerDebris;
 TreeDebris funnyTreeDebris;
+Microphone microphone;
 
 int groundLevel = 600;
 int cooldown = 300;
 int time = 0;
+int timer = 0;
 float mouseForce = 0.3;
 float HeartBeatSpeedMultiplier =1;
 float HeartBeatAmountMultiplier = 1;
@@ -29,7 +31,7 @@ color atmosphereCol;
 boolean isDesert;
 boolean rainy = false;
 
-float s = 5, xS = 10, yS = 8; // debug code for rain - delete if unwanted
+float s = 5, xS = 5, yS = 8; // debug code for rain - delete if unwanted
 
 
 void setup() {
@@ -53,6 +55,13 @@ void setup() {
 
   Flash = new flash(0);
 
+  // Microphone icon settings
+  PVector micPos = new PVector(width/2, height/2);
+  float micLifetime = 150; // ticks down per frame
+  float micFadeOutThreshold = 90; // per frame
+
+  microphone = new Microphone(micPos, micLifetime, micFadeOutThreshold);
+
   // FLOWER DEBRIS
   funnyFlowerDebris = new FlowerDebris();
   // TREE DEBRIS
@@ -71,7 +80,6 @@ void setup() {
 
 void draw() {
   background(#DEF8FF);
-  time++;
   // 1. Tell the analyzer to do its background math
   audioAnalyzer.update();
 
@@ -79,15 +87,23 @@ void draw() {
   float currentFreq = audioAnalyzer.latestAvgFreq;
   float currentVol = audioAnalyzer.latestAvgVol;
 
-  HeartBeatSpeedMultiplier = currentFreq;
-  HeartBeatAmountMultiplier = currentVol;
+  //fixes adjustnments for wind, clouds, rain, and lightning
+  HeartBeatSpeedMultiplier = currentFreq; //change to heartbeat
+  HeartBeatAmountMultiplier = currentVol; //change with heartbeat
+
+  //adjustment for trees and flowers
+  if (HeartBeatAmountMultiplier>=2.5) {
+    time++;
+  } else {
+    time+=3;
+  }
 
   float windForce = wind.getForce();
   funnyFlowerDebris.applyForce(windForce);
   funnyTreeDebris.applyForce(windForce);
 
   //make it desert/green
-  if (currentFreq<=1.3 && currentVol<=1.3 && millis()>5000) {
+  if (currentFreq<=1.3 && currentVol<=1.3 && millis()>5000 && !rainy) {
     hill[0].fadeDirection = -1; // wet fades out
     hill[1].fadeDirection = 1;  // dry fades in
     isDesert = true;
@@ -97,12 +113,29 @@ void draw() {
     isDesert = false;
   }
 
-  //make ligthning
-  if (currentFreq<=3 && currentVol>=3) {
-    for (int i=0; i<4; i++) {
-      strikeLightning(clouds[i]);
+  //makeLighntning with adjustment
+  if (currentFreq <= 2.5 && currentVol >= 2.5) {
+    timer++;
+    if (HeartBeatAmountMultiplier >= 2.5) {
+      if (timer >= 20) {
+        for (int i = 0; i < 4; i++) {
+          strikeLightning(clouds[i]);
+        }
+        Flash.displayFlash();
+        timer = 0;
+      }
+    } else {
+      if (timer >= 40) {
+        for (int i = 0; i < 4; i++) {
+          strikeLightning(clouds[i]);
+        }
+        Flash.displayFlash();
+        timer = 0;
+      }
     }
-    Flash.displayFlash();
+  } else {
+    // Reset the timer when the lightning conditions are no longer true
+    timer = 0;
   }
 
   //rain vs no rain
@@ -111,13 +144,12 @@ void draw() {
   } else {
     rainy = false;
   }
- 
+
   //make trees/flowers grow
   if (time>=cooldown && !isDesert) {
     if (currentVol <= 3) {
       PVector pos = new PVector(random(0, width), random(height/2-50, height));
       boolean isInArea = false;
-
       while (isInArea == false) {
         if (pos.x < width/2-250 && pos.y > height-590) {
           isInArea = true;
@@ -128,7 +160,6 @@ void draw() {
           pos = new PVector(random(0, width), random(height/2-50, height));
         }
       }
-
       if (currentVol <= 1.3) {
         funnyTreeDebris.createTree(pos);
       } else {
@@ -157,12 +188,20 @@ void draw() {
   funnyTreeDebris.update();
   funnyTreeDebris.render();
   sun.drawSun();
-  displayRain(rain, s, xS, yS); // change based on desired rain values [see displayRain()]
+  float xSpeed = xS*map(currentFreq, 1, 5, 1, 2);
+  float ySpeed = yS*map(currentFreq, 1, 5, 1, 2);
+  float slant = s*map(HeartBeatAmountMultiplier, 1, 5, 1, 2);
+  displayRain(rain, slant, xSpeed, ySpeed); // change based on desired rain values [see displayRain()]
 
 
   wind.update();
   dryness = hill[0].alpha;
   mountDry = 255 - dryness;
+
+  //make clouds
+  if (currentVol>=1.2 || currentFreq>=1.2) {
+    drawClouds();
+  }
 
   //change atmosphere color
   if (rainy) {
@@ -188,11 +227,9 @@ void draw() {
     funnyFlowerDebris.toggleGrowth(true);
     funnyTreeDebris.toggleGrowth(true);
   }
-  
-    //make clouds
-  if (currentVol>=1.2 || currentFreq>=1.2) {
-    drawClouds();
-  }
+
+  microphone.update();
+  microphone.render();
 
   //hb.update();
   //float bpm = hb.getBPM();
@@ -207,24 +244,7 @@ void draw() {
 }
 
 
-
-void keyPressed() {
-  //if (key == 't') { Debug code for rain - delete if unwanted
-  //  s--;
-  //} else if (key == 'y') {
-  //  s++;
-  //} else if (key == 'o') {
-  //  xS--;
-  //} else if (key == 'p') {
-  //  xS++;
-  //} else if (key == 'x') {
-  //  yS++;
-  //} else if (key == 'z') {
-  //  yS--;
-  //}
-}
-
-void displayRain(Rain rain2, float slant, float xSpeed, float ySpeed) { //slant determines the slantedness of the rain, xSpeed and ySpeed determine its movement speed 
+void displayRain(Rain rain2, float slant, float xSpeed, float ySpeed) { //slant determines the slantedness of the rain, xSpeed and ySpeed determine its movement speed
   rain2.modulateRain(slant, xSpeed, ySpeed);
   int rainOpaqueness = rain2.getRainOpacity();
   if (!rainy) {
